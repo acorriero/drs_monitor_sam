@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  drs-monitor-sam
+
+  SAM Template for drs-monitor-sam
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  DRSMonitorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: drs_monitor/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      Policies:
+      - Statement:
+        - Sid: DescribeSourceServers
+          Effect: Allow
+          Action:
+          - drs:Describe*
+          Resource: 'arn:aws:drs:us-west-2:${{env.Account}}:source-server/*'
+        - Sid: AllowPublishSNS
+          Effect: Allow
+          Action:
+          - sns:Publish
+          Resource: 'arn:aws:sns:us-east-1:${{env.Account}}:drs_replication_check'
